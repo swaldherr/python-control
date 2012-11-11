@@ -9,6 +9,7 @@
 import numpy as np
 import control
 from trajgen import Poly
+from trajgen import SystemTrajectory, LinearFlatSystem
 
 # Solve a point to point trajectory generation problem for a linear system
 def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
@@ -22,6 +23,9 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
         raise control.ControlNotImplemented(
             "only single input, single output systems are supported")
 
+    # Create a flat system representation
+    system = LinearFlatSystem(sys)
+    
     #
     # Determine the basis function set to use and make sure it is big enough
     #
@@ -34,22 +38,15 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
         raise ValueError("basis set is too small")
 
     #
-    # Find the transformation to bring the system into reachable form
-    # and use this to determine the flat output variable z = Cf*x
-    #
-    zsys, Tr = control.reachable_form(sys)
-    Cfz = np.zeros(np.shape(sys.C)); Cfz[-1] = 1
-    Cfx = Cfz * Tr
-
-    #
     # Map the initial and final conditions to flat output conditions
     #
     # We need to compute the output "flag": [z(t), z'(t), z''(t), ...]
     # and then evaluate this at the initial and final condition.
     #
+    #! TODO: should be able to represent flag variables as 1D arrays
     zflag_T0 = np.zeros((sys.states, 1));
     zflag_Tf = np.zeros((sys.states, 1));
-    H = Cfx                             # initial state transformation
+    H = system.C                        # initial state transformation
     for i in range(sys.states):
         zflag_T0[i, 0] = H * np.matrix(x0).T
         zflag_Tf[i, 0] = H * np.matrix(xf).T
@@ -85,8 +82,11 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
     #
     # Transform the trajectory from flat outputs to states and inputs
     #
-    xdfcn = alpha
-    udfcn = lambda t: 0
+    systraj = SystemTrajectory(sys.states, sys.inputs)
+    systraj.system = system
+    systraj.basis = basis
+    systraj.coeffs = alpha
 
     # Return a function that computes inputs and states as a function of time
-    return xdfcn, udfcn
+    return systraj
+
