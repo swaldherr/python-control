@@ -22,6 +22,7 @@ class LinearFlatSystem:
 
     # Compute state and input from flat flag
     def reverse(self, zflag):
-        x = self.Tinv * np.matrix(zflag[-2::-1]).T
-        u = zflag[-1] - self.F * x
+        z = np.matrix(zflag[-2::-1]).T
+        x = self.Tinv * z
+        u = zflag[-1] - self.F * z
         return np.reshape(x, self.states), np.reshape(u, self.inputs)

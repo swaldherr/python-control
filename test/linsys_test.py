@@ -17,7 +17,7 @@ class TestLinsys(unittest.TestCase):
     def setUp(self):
         self.maxStates = 5     # maximum number of states to try
         self.numTests = 4      # number of tests per system size
-        self.debug = True      # turn on debugging output
+        self.debug = False     # turn on debugging output
 
     def test_point_to_point(self):
         # Machine precision for floats.
@@ -45,8 +45,8 @@ class TestLinsys(unittest.TestCase):
                 # Generate a trajectory from start to stop
                 systraj = tg.linear_point_to_point(linsys, x0, xf, Tf)
                 xd, ud = systraj.eval((0,Tf))
-                np.testing.assert_array_almost_equal(x0, xd[0,:])
-                np.testing.assert_array_almost_equal(xf, xd[1,:])
+                np.testing.assert_array_almost_equal(x0, xd[0,:], decimal=4)
+                np.testing.assert_array_almost_equal(xf, xd[1,:], decimal=4)
         
 def suite():
    return unittest.TestLoader().loadTestsFromTestCase(TestLinsys)
