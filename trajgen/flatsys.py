@@ -5,33 +5,123 @@
 # flat nonlinear systems.  It is (very) loosely based on the NTG software
 # package developed by Mark Milam and Kudah Mushambi, but rewritten from
 # scratch in python.
+#
+# Copyright (c) 2012 by California Institute of Technology
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of the California Institute of Technology nor
+#    the names of its contributors may be used to endorse or promote
+#    products derived from this software without specific prior
+#    written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL CALTECH
+# OR THE CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+# USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
 
 import numpy as np
 import control
-from trajgen import Poly
-from trajgen import SystemTrajectory, LinearFlatSystem
+from trajgen import PolyFamily
+from trajgen import SystemTrajectory
+
+# Flat system class (for use as a base class)
+class FlatSystem:
+    """
+    The FlatSystem class is used as a base class to describe differentially
+    flat systems for trajectory generation.  The class must implement two
+    functions:
+
+    zflag = flatsys.foward(x, u)
+        This function computes the flag (derivatives) of the flat output.
+        The inputs to this function are the state 'x' and inputs 'u' (both
+        1D arrays).  The output should be a 2D array with the first
+        dimension equal to the number of system inputs and the second
+        dimension of the length required to represent the full system
+        dynamics (typically the number of states)
+
+    x, u = flatsys.reverse(zflag)
+        This function system state and inputs give the the flag
+        (derivatives) of the flat output.  The input to this function is an
+        2D array whose first dimension is equal to the number of system
+        inputs and whose second dimension is of length required to represent
+        the full system dynamics (typically the number of states).  The
+        output is the state 'x' and inputs 'u' (both 1D arrays).
+    """
+    def __init__(self, states, inputs):
+        # Save the number of inputs and outputs
+        self.states = states
+        self.inputs = inputs
 
 # Solve a point to point trajectory generation problem for a linear system
-def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
+def point_to_point(sys, x0, xf, Tf, T0 = 0, basis=None, cost=None):
+    """
+    Compute a trajectory between an initial condition and final condition
+
+      traj = point_to_point(flatsys, x0, xf, Tf)
+
+    Parameters
+    ----------
+    flatsys : FlatSystem object
+        Description of the differentially flat system.  This object must
+        define a function flatsys.forward() that takes the system state and
+        produceds the flag of flat outputs and a system flatsys.reverse()
+        that takes the flag of the flat output and prodes the state and
+        input.
+
+    x0, xf : 1D arrays
+        Define the desired initial and final conditions for the system
+
+    Tf : float
+        The final time for the trajectory (corresponding to xf)
+
+    T0 : float (optional)
+        The initial time for the trajectory (corresponding to x0).  If not
+        specified, its value is taken to be zero.
+
+    basis : BasisFamily object (optional)
+        The basis functions to use for generating the trajectory.  If not
+        specified, the PolyFamily basis family will be used, with the minimal
+        number of elements required to find a feasible trajectory (twice
+        the number of system states)
+
+    Returns
+    -------
+    traj : SystemTrajectory object
+        The system trajectory is returned as an object that implements the
+        eval() function, we can be used to compute the value of the state
+        and input and a given time t.
+
+    """
     #
     # Make sure the probelm is one that we can handle
     #
-    if (not control.isctime(sys)):
-        raise control.ControlNotImplemented(
-            "requires continuous time, linear control system")
-    elif (not control.issiso(sys)):
-        raise control.ControlNotImplemented(
-            "only single input, single output systems are supported")
+    #! TODO: put in tests for flat system input
 
-    # Create a flat system representation
-    system = LinearFlatSystem(sys)
-    
     #
     # Determine the basis function set to use and make sure it is big enough
     #
 
     # If no basis set was specified, use a polynomial basis (poor choice...)
-    if (basis is None): basis = Poly(2*sys.states)
+    if (basis is None): basis = PolyFamily(2*sys.states)
     
     # Make sure we have enough basis functions to solve the problem
     if (basis.N < 2*sys.states):
@@ -44,13 +134,8 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
     # and then evaluate this at the initial and final condition.
     #
     #! TODO: should be able to represent flag variables as 1D arrays
-    zflag_T0 = np.zeros((sys.states, 1));
-    zflag_Tf = np.zeros((sys.states, 1));
-    H = system.C                        # initial state transformation
-    for i in range(sys.states):
-        zflag_T0[i, 0] = H * np.matrix(x0).T
-        zflag_Tf[i, 0] = H * np.matrix(xf).T
-        H = H * sys.A                   # derivative for next iteration
+    zflag_T0 = sys.forward(x0)
+    zflag_Tf = sys.forward(xf)
 
     #
     # Compute the matrix constraints for initial and final conditions
@@ -83,7 +168,7 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
     # Transform the trajectory from flat outputs to states and inputs
     #
     systraj = SystemTrajectory(sys.states, sys.inputs)
-    systraj.system = system
+    systraj.system = sys
     systraj.basis = basis
     systraj.coeffs = alpha
 

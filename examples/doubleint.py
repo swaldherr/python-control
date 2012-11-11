@@ -12,13 +12,14 @@ import trajgen as tg                   # trajectory generation toolbox
 
 # Define a double integrator system
 sys1 = ctrl.tf2ss(ctrl.tf([1], [1, 0, 0]))
+sysf = tg.LinearFlatSystem(sys1)
 
 # Set the initial and final conditions
 x0 = (0, 0);
 xf = (1, 3);
 
 # Find a trajectory
-systraj = tg.linear_point_to_point(sys1, x0, xf, 1)
+systraj = tg.point_to_point(sysf, x0, xf, 1)
 
 # Plot the trajectory
 t = np.linspace(0, 1, 100)

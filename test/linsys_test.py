@@ -36,6 +36,9 @@ class TestLinsys(unittest.TestCase):
 
             if (self.debug): print(linsys)
 
+            # Create a flat system representation
+            flatsys = tg.LinearFlatSystem(linsys)
+
             # Generate several different initial and final conditions
             for i in range(self.numTests):
                 x0 = np.random.rand(linsys.states)
@@ -43,7 +46,7 @@ class TestLinsys(unittest.TestCase):
                 Tf = np.random.randn()
 
                 # Generate a trajectory from start to stop
-                systraj = tg.linear_point_to_point(linsys, x0, xf, Tf)
+                systraj = tg.point_to_point(flatsys, x0, xf, Tf)
                 xd, ud = systraj.eval((0,Tf))
                 np.testing.assert_array_almost_equal(x0, xd[0,:], decimal=4)
                 np.testing.assert_array_almost_equal(xf, xd[1,:], decimal=4)
