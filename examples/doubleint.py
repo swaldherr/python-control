@@ -17,5 +17,6 @@ xf = (1, 1);
 
 # Find a trajectory
 xd, ud = tg.linear_point_to_point(sys1, x0, xf, 1)
+print(xd)
 
 # Plot the trajectory

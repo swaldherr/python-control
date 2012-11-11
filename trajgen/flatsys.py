@@ -80,7 +80,7 @@ def linear_point_to_point(sys, x0, xf, Tf, basis=None, cost=None, T0 = 0):
     # least squares solution for now.
     #
     #! TODO: need to allow cost and constraints...
-    alpha = np.linalg.pinv(M) * np.vstack((zflag_T0, zflag_Tf))
+    alpha = np.dot(np.linalg.pinv(M), np.vstack((zflag_T0, zflag_Tf)))
 
     #
     # Transform the trajectory from flat outputs to states and inputs

@@ -14,4 +14,4 @@ class Poly:
     # Compute the kth derivative of the ith basis function at time t
     def eval_deriv(self, i, k, t):
         if (i < k): return 0;           # higher derivative than power
-        return sp.misc.factorial(k) * np.power(t, i-k)
+        return sp.misc.factorial(i)/sp.misc.factorial(i-k) * np.power(t, i-k)
