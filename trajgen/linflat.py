@@ -13,7 +13,7 @@ class LinearFlatSystem:
         self.Tinv = np.linalg.inv(Tr)   # computer inverse once
         
         # Compute the flat output variable z = C x
-        Cfz = np.zeros(np.shape(sys.C)); Cfz[-1] = 1
+        Cfz = np.zeros(np.shape(sys.C)); Cfz[0, -1] = 1
         self.C = Cfz * Tr
 
         # Keep track of the number of states and inputs
@@ -22,6 +22,6 @@ class LinearFlatSystem:
 
     # Compute state and input from flat flag
     def reverse(self, zflag):
-        x = self.Tinv * np.matrix(zflag[0:-1]).T
+        x = self.Tinv * np.matrix(zflag[-2::-1]).T
         u = zflag[-1] - self.F * x
         return np.reshape(x, self.states), np.reshape(u, self.inputs)

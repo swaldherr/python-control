@@ -15,7 +15,7 @@ sys1 = ctrl.tf2ss(ctrl.tf([1], [1, 0, 0]))
 
 # Set the initial and final conditions
 x0 = (0, 0);
-xf = (2, 1);
+xf = (1, 3);
 
 # Find a trajectory
 systraj = tg.linear_point_to_point(sys1, x0, xf, 1)
