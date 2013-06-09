@@ -1,12 +1,12 @@
 # Basis function families
-from trajgen.basis import BasisFamily
-from trajgen.poly import PolyFamily
+from control.trajgen.basis import BasisFamily
+from control.trajgen.poly import PolyFamily
 
 # Classes
-from trajgen.systraj import SystemTrajectory
-from trajgen.flatsys import FlatSystem
-from trajgen.linflat import LinearFlatSystem
+from control.trajgen.systraj import SystemTrajectory
+from control.trajgen.flatsys import FlatSystem
+from control.trajgen.linflat import LinearFlatSystem
 
 # Package functions 
-from trajgen.flatsys import point_to_point
+from control.trajgen.flatsys import point_to_point
 

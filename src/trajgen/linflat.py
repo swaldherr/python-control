@@ -37,7 +37,7 @@
 
 import numpy as np
 import control
-from trajgen.flatsys import FlatSystem
+from control.trajgen.flatsys import FlatSystem
 
 class LinearFlatSystem(FlatSystem):
     def __init__(self, sys):

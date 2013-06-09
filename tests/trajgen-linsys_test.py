@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 import control as ctrl
 import control.matlab as matlab
-import trajgen as tg
+import control.trajgen as tg
 
 class TestLinsys(unittest.TestCase):
     def setUp(self):

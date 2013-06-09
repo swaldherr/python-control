@@ -8,7 +8,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import control as ctrl                 # control system toolbox
-import trajgen as tg                   # trajectory generation toolbox
+import control.trajgen as tg           # trajectory generation toolbox
 
 # Define a double integrator system
 sys1 = ctrl.tf2ss(ctrl.tf([1], [1, 0, 0]))

@@ -1,8 +1,8 @@
-# poly.m - simple set of polynomial basis functions
+# basis.py - BasisFamily class
 # RMM, 10 Nov 2012
 #
-# This class implements a set of simple basis functions consisting of powers
-# of t: 1, t, t^2, ...
+# The BasisFamily class is used to specify a set of basis functions for
+# implementing differential flatness computations.
 #
 # Copyright (c) 2012 by California Institute of Technology
 # All rights reserved.
@@ -36,15 +36,7 @@
 # OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-import numpy as np
-import scipy as sp
-from control.trajgen.basis import BasisFamily
+# Basis family class (for use as a base class)
+class BasisFamily:
+    pass
 
-class PolyFamily(BasisFamily):
-    def __init__(self, N):
-        self.N = N                    # save number of basis functions
-
-    # Compute the kth derivative of the ith basis function at time t
-    def eval_deriv(self, i, k, t):
-        if (i < k): return 0;           # higher derivative than power
-        return sp.misc.factorial(i)/sp.misc.factorial(i-k) * np.power(t, i-k)

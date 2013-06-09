@@ -1,5 +1,13 @@
 2013-06-09  Richard Murray  <murray@altura-2.local>
 
+	* src/freqplot.py (nyquist_plot): updated documentation to refer to
+        function as nyquist_plot (full name)
+
+	* branches/trajgen-rmm: Created branch for testing trajectory
+	generation routines (using differential flatness)
+
+2013-06-09  Richard Murray  <murray@altura-2.local>
+
 	* tests/bdalg_test.py (TestFeedback.testScalarSS)
 	(TestFeedback.testScalarTF): added simple test of default argument
 	to feedback() for state space and transfer function systems

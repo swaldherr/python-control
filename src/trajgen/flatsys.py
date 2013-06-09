@@ -40,8 +40,8 @@
 
 import numpy as np
 import control
-from trajgen import PolyFamily
-from trajgen import SystemTrajectory
+from control.trajgen import PolyFamily
+from control.trajgen import SystemTrajectory
 
 # Flat system class (for use as a base class)
 class FlatSystem:
@@ -115,6 +115,7 @@ def point_to_point(sys, x0, xf, Tf, T0 = 0, basis=None, cost=None):
     # Make sure the probelm is one that we can handle
     #
     #! TODO: put in tests for flat system input
+    #! TODO: process initial and final conditions to allow x0 or (x0, u0)
 
     #
     # Determine the basis function set to use and make sure it is big enough
@@ -134,6 +135,7 @@ def point_to_point(sys, x0, xf, Tf, T0 = 0, basis=None, cost=None):
     # and then evaluate this at the initial and final condition.
     #
     #! TODO: should be able to represent flag variables as 1D arrays
+    #! TODO: need inputs to fully define the flag
     zflag_T0 = sys.forward(x0)
     zflag_Tf = sys.forward(xf)
 
