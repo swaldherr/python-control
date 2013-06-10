@@ -1,5 +1,7 @@
 2013-06-09  Richard Murray  <murray@altura-2.local>
 
+	* ChangeLog: Change to log to test commit hook
+
 	* src/freqplot.py (nyquist_plot): updated documentation to refer to
         function as nyquist_plot (full name)
 
