@@ -59,7 +59,7 @@ __all__ = ['bode_plot', 'nyquist_plot', 'gangof4_plot',
 
 # Bode plot
 def bode_plot(syslist, omega=None, dB=None, Hz=None, deg=None,
-        Plot=True, omega_limits=None, omega_num=None, *args, **kwargs):
+        Plot=True, omega_limits=None, omega_num=None, shift_phase=0.0, *args, **kwargs):
     """Bode plot for a system
 
     Plots a Bode plot for the system over a (optional) frequency range.
@@ -83,6 +83,8 @@ def bode_plot(syslist, omega=None, dB=None, Hz=None, deg=None,
         If Hz=True the limits are in Hz otherwise in rad/s.
     omega_num: int
         number of samples
+    shift_phase: real number
+        shift phase in plot by this number (in radians or degrees according to 'deg' argument)
     *args, **kwargs:
         Additional options to matplotlib (color, linestyle, etc)
 
@@ -151,7 +153,7 @@ def bode_plot(syslist, omega=None, dB=None, Hz=None, deg=None,
             mag_tmp, phase_tmp, omega_sys = sys.freqresp(omega_sys)
             mag = np.atleast_1d(np.squeeze(mag_tmp))
             phase = np.atleast_1d(np.squeeze(phase_tmp))
-            phase = unwrap(phase)
+            phase = unwrap(phase) + (2 * np.pi * shift_phase / 360 if deg else shift_phase)
             nyquistfrq_plot = None
             if Hz:
                 omega_plot = omega_sys / (2. * np.pi)
